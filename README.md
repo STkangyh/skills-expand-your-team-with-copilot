@@ -13,13 +13,20 @@ This project demonstrates how GitHub Copilot can effectively expand your develop
 
 ## ✨ Features
 
-### Core Functionality
+### Task Manager Demo (Original Project)
 - ➕ **Add Tasks**: Create new tasks with priority levels (High, Medium, Low)
 - ✅ **Task Management**: Mark tasks as complete or pending
 - 🗑️ **Delete Tasks**: Remove tasks with confirmation
 - 🔍 **Smart Filtering**: View all, pending, or completed tasks
 - 📊 **Real-time Statistics**: Track productivity and task completion rates
 - 💾 **Persistent Storage**: Tasks are saved locally in the browser
+
+### Professional Blog (New Addition)
+- 📝 **Project Acknowledgements**: Dedicated space for crediting AI assistance and collaborators
+- 🤖 **AI Development Insights**: Best practices for working with GitHub Copilot
+- 📚 **Development Tutorials**: Guides and technical documentation
+- 🎨 **Modern Design**: Responsive Next.js blog with Tailwind CSS
+- 🚀 **Static Export**: Optimized for deployment on any hosting platform
 
 ### User Experience
 - 🎨 **Modern UI Design**: Clean, responsive interface with gradient backgrounds
@@ -38,9 +45,9 @@ This project demonstrates how GitHub Copilot can effectively expand your develop
 
 ### Prerequisites
 - A modern web browser (Chrome, Firefox, Safari, Edge)
-- Node.js (optional, for development server)
+- Node.js (for development server and blog functionality)
 
-### Quick Start
+### Quick Start - Task Manager Demo
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/STkangyh/skills-expand-your-team-with-copilot.git
@@ -66,14 +73,44 @@ This project demonstrates how GitHub Copilot can effectively expand your develop
    npm run dev
    ```
 
+### Professional Blog Setup
+1. **Navigate to the blog directory**:
+   ```bash
+   cd blog
+   ```
+
+2. **Install blog dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the blog development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Visit the blog**:
+   Open [http://localhost:3000](http://localhost:3000) in your browser
+
+5. **Build for production**:
+   ```bash
+   npm run build
+   # Static files will be generated in the 'out' directory
+   ```
+
 ## 📁 Project Structure
 
 ```
-team-task-manager/
-├── index.html          # Main HTML structure
+skills-expand-your-team-with-copilot/
+├── index.html          # Main HTML structure (Task Manager Demo)
 ├── styles.css          # CSS styling and responsive design
 ├── script.js           # JavaScript functionality and logic
 ├── package.json        # Project configuration and dependencies
+├── blog/               # Next.js Professional Blog
+│   ├── src/
+│   │   └── app/        # Next.js App Router pages
+│   ├── README.md       # Blog documentation
+│   └── package.json    # Blog dependencies
 └── README.md          # Project documentation (this file)
 ```
 
