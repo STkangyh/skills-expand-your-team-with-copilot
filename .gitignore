@@ -1,5 +1,8 @@
 # Dependencies
 node_modules/
+blog/node_modules/
+blog/out/
+blog/.next/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
