@@ -40,6 +40,8 @@ This blog serves as a professional platform for:
 ```
 blog/
 ├── src/
+│   ├── data/
+│   │   └── blog.ts             # Centralized blog data and interfaces
 │   └── app/
 │       ├── globals.css          # Global styles
 │       ├── layout.tsx           # Root layout component
@@ -57,9 +59,10 @@ blog/
 ```
 
 ### Content Management
-- **Static Content**: Blog posts are currently defined as TypeScript objects
+- **Centralized Data**: Blog posts are defined in a single file (`src/data/blog.ts`)
+- **Type Safety**: Full TypeScript interfaces exported from the central data file
+- **Helper Functions**: Utility functions for accessing and filtering posts
 - **Dynamic Routes**: Automatic generation of post pages using Next.js dynamic routing
-- **Type Safety**: Full TypeScript interfaces for blog post structure
 - **Extensible**: Easy to integrate with a CMS or markdown files in the future
 
 ## 🚀 Getting Started
@@ -110,6 +113,7 @@ interface BlogPost {
 1. **"Acknowledging GitHub Copilot in My Projects"** - Best practices for AI acknowledgement
 2. **"Lessons from Human-AI Collaboration"** - Insights from working with AI assistants
 3. **"Setting Up a Professional Blog with Next.js"** - Technical tutorial and guide
+4. **"Acknowledging Open Source Dependencies"** - Best practices for crediting libraries
 
 ## 🎨 Customization
 
@@ -122,10 +126,10 @@ The blog uses Tailwind CSS for styling. Key design elements:
 - **Responsive**: Mobile-first design with breakpoint-specific styles
 
 ### Adding New Posts
-To add new blog posts, extend the `blogPosts` object in `/src/app/posts/[slug]/page.tsx`:
+To add new blog posts, extend the `blogPosts` object in `/src/data/blog.ts`:
 
 ```typescript
-const blogPosts: Record<string, BlogPost> = {
+export const blogPosts: Record<string, BlogPost> = {
   "your-post-slug": {
     id: "your-post-slug",
     title: "Your Post Title",
@@ -138,6 +142,8 @@ const blogPosts: Record<string, BlogPost> = {
   }
 };
 ```
+
+All pages will automatically use the updated data from this central location.
 
 ## 🌐 Deployment
 

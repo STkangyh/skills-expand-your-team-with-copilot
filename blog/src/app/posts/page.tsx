@@ -1,50 +1,8 @@
 import Link from "next/link";
-
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  category: string;
-  readTime: string;
-}
-
-const blogPosts: BlogPost[] = [
-  {
-    id: "github-copilot-acknowledgement",
-    title: "Acknowledging GitHub Copilot in My Projects",
-    excerpt: "How I properly credit AI assistance and collaboration in my development projects, including best practices for acknowledgements and ethical considerations.",
-    date: "2024-01-15",
-    category: "AI Development",
-    readTime: "5 min read"
-  },
-  {
-    id: "project-collaboration-insights",
-    title: "Lessons from Human-AI Collaboration",
-    excerpt: "Key insights and learnings from working with AI coding assistants on real-world projects, including productivity gains and collaboration patterns.",
-    date: "2024-01-10",
-    category: "Development",
-    readTime: "8 min read"
-  },
-  {
-    id: "next-js-blog-setup",
-    title: "Setting Up a Professional Blog with Next.js",
-    excerpt: "A comprehensive guide to creating a blog for project documentation and acknowledgements using Next.js, TypeScript, and Tailwind CSS.",
-    date: "2024-01-05",
-    category: "Tutorial",
-    readTime: "12 min read"
-  },
-  {
-    id: "open-source-contributions",
-    title: "Acknowledging Open Source Dependencies",
-    excerpt: "Best practices for crediting open source libraries, contributors, and maintainers in your projects and documentation.",
-    date: "2024-01-01",
-    category: "Open Source",
-    readTime: "6 min read"
-  }
-];
+import { getAllPosts } from "@/data/blog";
 
 export default function PostsPage() {
+  const blogPosts = getAllPosts();
   const uniqueCategories = new Set(blogPosts.map(post => post.category));
   const categories = Array.from(uniqueCategories);
 
