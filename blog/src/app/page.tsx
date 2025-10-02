@@ -1,40 +1,9 @@
 import Link from "next/link";
-
-// Blog post type
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  category: string;
-}
-
-// Sample blog posts for demonstration
-const blogPosts: BlogPost[] = [
-  {
-    id: "github-copilot-acknowledgement",
-    title: "Acknowledging GitHub Copilot in My Projects",
-    excerpt: "How I properly credit AI assistance and collaboration in my development projects, including best practices for acknowledgements.",
-    date: "2024-01-15",
-    category: "AI Development"
-  },
-  {
-    id: "project-collaboration-insights",
-    title: "Lessons from Human-AI Collaboration",
-    excerpt: "Key insights and learnings from working with AI coding assistants on real-world projects.",
-    date: "2024-01-10",
-    category: "Development"
-  },
-  {
-    id: "next-js-blog-setup",
-    title: "Setting Up a Professional Blog with Next.js",
-    excerpt: "A comprehensive guide to creating a blog for project documentation and acknowledgements.",
-    date: "2024-01-05",
-    category: "Tutorial"
-  }
-];
+import { getAllPosts } from "@/data/blog";
 
 export default function Home() {
+  const blogPosts = getAllPosts().slice(0, 3); // Get first 3 posts for homepage
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
       {/* Header */}
