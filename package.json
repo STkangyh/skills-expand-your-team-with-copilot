@@ -14,6 +14,7 @@
     "next": "^14.2.33",
     "react": "^18",
     "react-dom": "^18",
+    "react-markdown": "^10.1.0",
     "ssr": "^7.0.5",
     "supabase": "^2.48.3"
   },

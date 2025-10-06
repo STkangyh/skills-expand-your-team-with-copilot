@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { blogPosts, getPostById } from "@/data/blog";
+import ReactMarkdown from "react-markdown";
 
 export async function generateStaticParams() {
   return Object.keys(blogPosts).map((slug) => ({
@@ -85,9 +86,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
         {/* Article Content */}
         <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-12">
           <div className="prose prose-lg max-w-none dark:prose-invert">
-            <div style={{ whiteSpace: 'pre-wrap' }}>
-              {post.content}
-            </div>
+            <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
         </article>
 
