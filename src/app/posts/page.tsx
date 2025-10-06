@@ -25,6 +25,9 @@ export default function PostsPage() {
               <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 About
               </Link>
+              <Link href="/write" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Write
+              </Link>
             </div>
           </nav>
         </div>
