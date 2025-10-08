@@ -1,5 +1,4 @@
 import { createClient as createBrowserClient } from './client'
-import { createClient as createServerClient } from './server'
 
 // Extended BlogPost interface with database fields
 export interface BlogPost {
@@ -78,7 +77,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
       category: input.category,
       author: input.author,
       readTime: readTime,
-      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+      date: new Date().toISOString().split('T')[0],
     })
     .select()
     .single();
@@ -147,98 +146,6 @@ export async function updateBlogPost(id: string, input: UpdateBlogPostInput): Pr
  */
 export async function deleteBlogPost(id: string): Promise<{ error: Error | null }> {
   const supabase = createBrowserClient();
-  
-  const { error } = await supabase
-    .from('blogs')
-    .delete()
-    .eq('id', id);
-
-  return { error };
-}
-
-/**
- * Server-side version: Create a new blog post in Supabase
- */
-export async function createBlogPostServer(input: CreateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
-  const supabase = await createServerClient();
-  
-  const slug = generateSlug(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
-  
-  const { data, error } = await supabase
-    .from('blogs')
-    .insert({
-      id: slug,
-      title: input.title,
-      content: input.content,
-      excerpt: input.excerpt,
-      category: input.category,
-      author: input.author,
-      readTime: readTime,
-      date: new Date().toISOString().split('T')[0],
-    })
-    .select()
-    .single();
-
-  return { data, error };
-}
-
-/**
- * Server-side version: Get all blog posts from Supabase
- */
-export async function getAllBlogPostsServer(): Promise<{ data: BlogPost[] | null; error: Error | null }> {
-  const supabase = await createServerClient();
-  
-  const { data, error } = await supabase
-    .from('blogs')
-    .select('*')
-    .order('date', { ascending: false });
-
-  return { data, error };
-}
-
-/**
- * Server-side version: Get a single blog post by ID from Supabase
- */
-export async function getBlogPostByIdServer(id: string): Promise<{ data: BlogPost | null; error: Error | null }> {
-  const supabase = await createServerClient();
-  
-  const { data, error } = await supabase
-    .from('blogs')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  return { data, error };
-}
-
-/**
- * Server-side version: Update an existing blog post in Supabase
- */
-export async function updateBlogPostServer(id: string, input: UpdateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
-  const supabase = await createServerClient();
-  
-  const updateData: Partial<BlogPost> = { ...input };
-  
-  if (input.content) {
-    updateData.readTime = calculateReadTime(input.content);
-  }
-  
-  const { data, error } = await supabase
-    .from('blogs')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-
-  return { data, error };
-}
-
-/**
- * Server-side version: Delete a blog post from Supabase
- */
-export async function deleteBlogPostServer(id: string): Promise<{ error: Error | null }> {
-  const supabase = await createServerClient();
   
   const { error } = await supabase
     .from('blogs')
