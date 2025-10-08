@@ -19,6 +19,8 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
 ```
 
+> **Important**: The application will throw a clear error message if these environment variables are not set, directing you to configure them properly. Make sure to replace the placeholder values with your actual Supabase credentials from your project settings.
+
 ### 2. Database Table Schema
 Execute this SQL in your Supabase SQL Editor:
 
@@ -356,6 +358,13 @@ To test the CRUD operations:
 4. Visit `/posts/[slug]` to view individual posts
 
 ## Troubleshooting
+
+### Missing environment variables error?
+If you see an error like "Missing Supabase environment variables", this means your `.env.local` file is not properly configured:
+1. Create a `.env.local` file in the root directory if it doesn't exist
+2. Copy the contents from `.env.example`
+3. Replace the placeholder values with your actual Supabase credentials from: https://supabase.com/dashboard/project/_/settings/api
+4. Restart your development server (`npm run dev`)
 
 ### Posts not appearing?
 - Check Supabase credentials in `.env.local`
