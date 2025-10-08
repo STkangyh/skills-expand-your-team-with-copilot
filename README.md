@@ -32,6 +32,7 @@ This blog serves as a professional platform for:
 - **Next.js 14**: Latest App Router with server-side rendering
 - **TypeScript**: Full type safety and better developer experience
 - **Tailwind CSS**: Utility-first styling with responsive design
+- **Supabase Integration**: Full CRUD operations for blog management
 - **Static Export**: Optimized for deployment on any static hosting platform
 
 ## 🏗️ Architecture
@@ -63,6 +64,7 @@ blog/
 - **Type Safety**: Full TypeScript interfaces exported from the central data file
 - **Helper Functions**: Utility functions for accessing and filtering posts
 - **Dynamic Routes**: Automatic generation of post pages using Next.js dynamic routing
+- **Supabase CRUD**: Full Create, Read, Update, Delete operations via Supabase
 - **Extensible**: Easy to integrate with a CMS or markdown files in the future
 
 ## 🚀 Getting Started
@@ -70,14 +72,54 @@ blog/
 ### Prerequisites
 - Node.js 18.17 or later
 - npm or yarn package manager
+- Supabase account (for database features)
+
+### Environment Setup
+Create a `.env.local` file in the root directory with your Supabase credentials:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+```
+
+### Supabase Database Setup
+Create a `blogs` table in your Supabase project with the following schema:
+
+```sql
+CREATE TABLE blogs (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  excerpt TEXT NOT NULL,
+  date TEXT NOT NULL,
+  category TEXT NOT NULL,
+  readTime TEXT NOT NULL,
+  author TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Add an updated_at trigger
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_blogs_updated_at BEFORE UPDATE ON blogs
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
 
 ### Installation & Development
 ```bash
-# Navigate to the blog directory
-cd blog
-
 # Install dependencies
 npm install
+
+# Set up environment variables (see Environment Setup above)
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
 
 # Start development server
 npm run dev
@@ -98,14 +140,53 @@ npm run build
 ### Blog Post Interface
 ```typescript
 interface BlogPost {
-  id: string;           // Unique identifier and URL slug
-  title: string;        // Post title
-  content: string;      // Full post content (markdown-formatted)
-  excerpt: string;      // Short description for listings
-  date: string;         // Publication date (YYYY-MM-DD)
-  category: string;     // Post category
-  readTime: string;     // Estimated reading time
-  author: string;       // Author name
+  id: string;              // Unique identifier and URL slug
+  title: string;           // Post title
+  content: string;         // Full post content (markdown-formatted)
+  excerpt: string;         // Short description for listings
+  date: string;            // Publication date (YYYY-MM-DD)
+  category: string;        // Post category
+  readTime: string;        // Estimated reading time
+  author: string;          // Author name
+  created_at?: string;     // Database creation timestamp
+  updated_at?: string;     // Database update timestamp
+}
+```
+
+### CRUD Operations
+
+The application includes comprehensive Supabase CRUD functions in `src/utils/supabase/blogCrud.ts`:
+
+#### Client-Side Functions
+- `createBlogPost(input)` - Create a new blog post
+- `getAllBlogPosts()` - Get all blog posts
+- `getBlogPostById(id)` - Get a single blog post by ID
+- `updateBlogPost(id, input)` - Update an existing blog post
+- `deleteBlogPost(id)` - Delete a blog post
+
+#### Server-Side Functions
+- `createBlogPostServer(input)` - Server-side create
+- `getAllBlogPostsServer()` - Server-side read all
+- `getBlogPostByIdServer(id)` - Server-side read one
+- `updateBlogPostServer(id, input)` - Server-side update
+- `deleteBlogPostServer(id)` - Server-side delete
+
+#### Usage Example
+```typescript
+import { createBlogPost } from '@/utils/supabase/blogCrud';
+
+const { data, error } = await createBlogPost({
+  title: "My New Blog Post",
+  content: "# Hello World\n\nThis is my post content.",
+  excerpt: "A brief description of my post",
+  category: "Development",
+  author: "Developer"
+});
+
+if (error) {
+  console.error('Error creating post:', error);
+} else {
+  console.log('Created post:', data);
 }
 ```
 
@@ -126,7 +207,15 @@ The blog uses Tailwind CSS for styling. Key design elements:
 - **Responsive**: Mobile-first design with breakpoint-specific styles
 
 ### Adding New Posts
-To add new blog posts, extend the `blogPosts` object in `/src/data/blog.ts`:
+
+#### Option 1: Using the Web Interface
+1. Navigate to `/write` in your browser
+2. Fill in the blog post form with title, excerpt, content, category, and author
+3. Click "Create Post" to save to Supabase
+4. The post will be automatically saved with a URL-friendly slug
+
+#### Option 2: Using Code (Legacy)
+To add new blog posts programmatically, extend the `blogPosts` object in `/src/data/blog.ts`:
 
 ```typescript
 export const blogPosts: Record<string, BlogPost> = {
@@ -143,7 +232,10 @@ export const blogPosts: Record<string, BlogPost> = {
 };
 ```
 
-All pages will automatically use the updated data from this central location.
+#### Managing Posts
+- Visit `/manage` to view, edit, and delete blog posts from your Supabase database
+- Posts are displayed in a table with actions for each post
+- Delete functionality includes confirmation prompts
 
 ## 🌐 Deployment
 
