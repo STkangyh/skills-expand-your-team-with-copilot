@@ -2,20 +2,50 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { createBlogPost } from "@/utils/supabase/blogCrud";
+import { useRouter } from "next/navigation";
 
 export default function WritePage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("Development");
+  const [author, setAuthor] = useState("Developer");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = ["AI Development", "Development", "Tutorial", "Open Source"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just log the data
-    console.log({ title, excerpt, content, category });
-    alert("Post preview logged to console! (Actual submission not implemented yet)");
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const { data, error: submitError } = await createBlogPost({
+        title,
+        excerpt,
+        content,
+        category,
+        author,
+      });
+
+      if (submitError) {
+        throw new Error(submitError.message || "Failed to create blog post");
+      }
+
+      if (data) {
+        alert("Blog post created successfully!");
+        router.push(`/posts/${data.id}`);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -132,23 +162,50 @@ export default function WritePage() {
               </p>
             </div>
 
+            {/* Author Field */}
+            <div>
+              <label htmlFor="author" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                Author
+              </label>
+              <input
+                type="text"
+                id="author"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Enter author name..."
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-800 dark:text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                disabled={isSubmitting}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                Preview Post
+                {isSubmitting ? "Creating Post..." : "Create Post"}
               </button>
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => {
                   setTitle("");
                   setExcerpt("");
                   setContent("");
                   setCategory("Development");
+                  setAuthor("Developer");
+                  setError(null);
                 }}
-                className="px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-semibold transition-colors"
+                className="px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
               >
                 Clear
               </button>
