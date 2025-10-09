@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getAllPosts } from "@/data/blog";
+import { getAllBlogPostsServer } from "@/utils/supabase/blogCrudServer";
 
-export default function PostsPage() {
-  const blogPosts = getAllPosts();
-  const uniqueCategories = new Set(blogPosts.map(post => post.category));
+export default async function PostsPage() {
+  const { data: blogPosts } = await getAllBlogPostsServer();
+  const posts = blogPosts || [];
+  const uniqueCategories = new Set(posts.map(post => post.category));
   const categories = Array.from(uniqueCategories);
 
   return (
@@ -63,7 +64,7 @@ export default function PostsPage() {
 
         {/* Posts Grid */}
         <section className="grid gap-8 md:grid-cols-2">
-          {blogPosts.map((post) => (
+          {posts.map((post) => (
             <article 
               key={post.id} 
               className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
@@ -75,7 +76,7 @@ export default function PostsPage() {
                 <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <time>{new Date(post.date).toLocaleDateString()}</time>
                   <span>•</span>
-                  <span>{post.readTime}</span>
+                  <span>{post.readtime}</span>
                 </div>
               </div>
               
