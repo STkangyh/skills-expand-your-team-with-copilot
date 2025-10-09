@@ -75,12 +75,21 @@ blog/
 - Supabase account (for database features)
 
 ### Environment Setup
-Create a `.env.local` file in the root directory with your Supabase credentials:
+
+> **✨ Quick Start**: A `.env.local` file has been created for you! See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed setup instructions.
+
+Create or update the `.env.local` file in the root directory with your Supabase credentials:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
 ```
+
+Get your credentials from: https://supabase.com/dashboard/project/_/settings/api
+
+**📚 Documentation:**
+- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Complete setup guide
+- [ENV_SETUP_SUMMARY.md](./ENV_SETUP_SUMMARY.md) - Quick reference
 
 ### Supabase Database Setup
 Create a `blogs` table in your Supabase project with the following schema:
