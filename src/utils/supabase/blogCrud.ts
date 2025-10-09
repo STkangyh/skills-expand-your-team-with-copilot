@@ -8,7 +8,21 @@ export interface BlogPost {
   excerpt: string;
   date: string;
   category: string;
-  readTime: string;
+  readtime: string; // Changed to match database column
+  author: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Display interface that maps database fields to UI-friendly names
+export interface BlogPostDisplay {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  date: string;
+  category: string;
+  readtime: string; // UI-friendly name
   author: string;
   created_at?: string;
   updated_at?: string;
@@ -21,7 +35,7 @@ export interface CreateBlogPostInput {
   excerpt: string;
   category: string;
   author: string;
-  readTime?: string;
+  readtime?: string;
 }
 
 // Input type for updating an existing blog post
@@ -31,7 +45,7 @@ export interface UpdateBlogPostInput {
   excerpt?: string;
   category?: string;
   author?: string;
-  readTime?: string;
+  readtime?: string;
 }
 
 /**
@@ -58,14 +72,52 @@ function generateSlug(title: string): string {
 }
 
 /**
+ * Generate a unique slug by checking existing posts and adding a number if needed
+ */
+async function generateUniqueSlug(title: string): Promise<string> {
+  const supabase = createBrowserClient();
+  const baseSlug = generateSlug(title);
+  
+  // Check if the base slug exists
+  const { data: existing } = await supabase
+    .from('blogs')
+    .select('id')
+    .eq('id', baseSlug)
+    .single();
+  
+  if (!existing) {
+    return baseSlug;
+  }
+  
+  // If it exists, try with numbers
+  let counter = 1;
+  let uniqueSlug = `${baseSlug}-${counter}`;
+  
+  while (true) {
+    const { data: existingNumbered } = await supabase
+      .from('blogs')
+      .select('id')
+      .eq('id', uniqueSlug)
+      .single();
+    
+    if (!existingNumbered) {
+      return uniqueSlug;
+    }
+    
+    counter++;
+    uniqueSlug = `${baseSlug}-${counter}`;
+  }
+}
+
+/**
  * Create a new blog post in Supabase
  * Client-side version
  */
 export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = createBrowserClient();
   
-  const slug = generateSlug(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
+  const slug = await generateUniqueSlug(input.title);
+  const readtime = input.readtime || calculateReadTime(input.content);
   
   const { data, error } = await supabase
     .from('blogs')
@@ -76,7 +128,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readTime: readTime,
+      readtime: readtime, // Changed from readTime to readtime to match database column
       date: new Date().toISOString().split('T')[0],
     })
     .select()
@@ -122,12 +174,14 @@ export async function getBlogPostById(id: string): Promise<{ data: BlogPost | nu
  */
 export async function updateBlogPost(id: string, input: UpdateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = createBrowserClient();
-  
-  const updateData: Partial<BlogPost> = { ...input };
-  
-  // Recalculate read time if content is being updated
+
+  const updateData: UpdateBlogPostInput = { ...input };
+
+  // Add readTime calculation back - use database column name
   if (input.content) {
-    updateData.readTime = calculateReadTime(input.content);
+    updateData.readtime = calculateReadTime(input.content);
+    // Remove the camelCase version to avoid confusion
+    delete updateData.readtime;
   }
   
   const { data, error } = await supabase
@@ -153,4 +207,32 @@ export async function deleteBlogPost(id: string): Promise<{ error: Error | null 
     .eq('id', id);
 
   return { error };
+}
+
+/**
+ * Create or update a blog post (upsert)
+ * Client-side version
+ */
+export async function upsertBlogPost(input: CreateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
+  const supabase = createBrowserClient();
+  
+  const slug = generateSlug(input.title);
+  const readtime = input.readtime || calculateReadTime(input.content);
+  
+  const { data, error } = await supabase
+    .from('blogs')
+    .upsert({
+      id: slug,
+      title: input.title,
+      content: input.content,
+      excerpt: input.excerpt,
+      category: input.category,
+      author: input.author,
+      readtime: readtime,
+      date: new Date().toISOString().split('T')[0],
+    })
+    .select()
+    .single();
+
+  return { data, error };
 }

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import highlight.js theme for code syntax highlighting */
+@import 'highlight.js/styles/github.css';
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
