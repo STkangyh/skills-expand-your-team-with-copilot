@@ -25,12 +25,50 @@ function generateSlug(title: string): string {
 }
 
 /**
+ * Generate a unique slug by checking existing posts and adding a number if needed
+ */
+async function generateUniqueSlugServer(title: string): Promise<string> {
+  const supabase = await createServerClient();
+  const baseSlug = generateSlug(title);
+  
+  // Check if the base slug exists
+  const { data: existing } = await supabase
+    .from('blogs')
+    .select('id')
+    .eq('id', baseSlug)
+    .single();
+  
+  if (!existing) {
+    return baseSlug;
+  }
+  
+  // If it exists, try with numbers
+  let counter = 1;
+  let uniqueSlug = `${baseSlug}-${counter}`;
+  
+  while (true) {
+    const { data: existingNumbered } = await supabase
+      .from('blogs')
+      .select('id')
+      .eq('id', uniqueSlug)
+      .single();
+    
+    if (!existingNumbered) {
+      return uniqueSlug;
+    }
+    
+    counter++;
+    uniqueSlug = `${baseSlug}-${counter}`;
+  }
+}
+
+/**
  * Server-side version: Create a new blog post in Supabase
  */
 export async function createBlogPostServer(input: CreateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = await createServerClient();
   
-  const slug = generateSlug(input.title);
+  const slug = await generateUniqueSlugServer(input.title);
   const readTime = input.readTime || calculateReadTime(input.content);
   
   const { data, error } = await supabase
@@ -42,7 +80,7 @@ export async function createBlogPostServer(input: CreateBlogPostInput): Promise<
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readTime: readTime,
+      readtime: readTime,
       date: new Date().toISOString().split('T')[0],
     })
     .select()
@@ -86,10 +124,11 @@ export async function getBlogPostByIdServer(id: string): Promise<{ data: BlogPos
 export async function updateBlogPostServer(id: string, input: UpdateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = await createServerClient();
   
-  const updateData: Partial<BlogPost> = { ...input };
+  const updateData: any = { ...input };
   
   if (input.content) {
-    updateData.readTime = calculateReadTime(input.content);
+    updateData.readtime = calculateReadTime(input.content);
+    delete updateData.readTime;
   }
   
   const { data, error } = await supabase

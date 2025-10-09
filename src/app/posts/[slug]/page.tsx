@@ -1,18 +1,52 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { blogPosts, getPostById } from "@/data/blog";
+import { getAllBlogPostsServer, getBlogPostByIdServer } from "@/utils/supabase/blogCrudServer";
 import ReactMarkdown from "react-markdown";
 
 export async function generateStaticParams() {
-  return Object.keys(blogPosts).map((slug) => ({
-    slug,
-  }));
+  // Define known slugs as fallback
+  const fallbackSlugs = [
+    { slug: 'test' },
+    { slug: 'getting-started-with-nextjs' },
+    { slug: 'building-modern-web-apps' },
+    { slug: 'typescript-best-practices' }
+  ];
+  
+  try {
+    const { data: posts, error } = await getAllBlogPostsServer();
+    
+    if (error || !posts) {
+      console.warn('Using fallback slugs due to Supabase error:', error);
+      return fallbackSlugs;
+    }
+    
+    const params = posts.map((post) => ({
+      slug: post.id,
+    }));
+    
+    // Merge Supabase posts with fallback slugs to ensure all known posts are included
+    const allSlugs = [...params];
+    fallbackSlugs.forEach(fallback => {
+      if (!allSlugs.some(p => p.slug === fallback.slug)) {
+        allSlugs.push(fallback);
+      }
+    });
+    
+    console.log('Generated static params:', allSlugs);
+    return allSlugs;
+  } catch (error) {
+    console.warn('Error generating static params, using fallback:', error);
+    return fallbackSlugs;
+  }
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const post = getPostById(params.slug);
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  const { data: post, error } = await getBlogPostByIdServer(params.slug);
 
   if (!post) {
+    if (error) {
+      console.error('Error fetching post:', error);
+    }
     notFound();
   }
 
@@ -79,7 +113,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
               month: 'long', 
               day: 'numeric' 
             })}</time>
-            <span>{post.readTime}</span>
+            <span>{post.readtime}</span>
           </div>
         </header>
 
