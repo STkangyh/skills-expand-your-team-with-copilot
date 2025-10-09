@@ -22,7 +22,7 @@ export interface BlogPostDisplay {
   excerpt: string;
   date: string;
   category: string;
-  readTime: string; // UI-friendly name
+  readtime: string; // UI-friendly name
   author: string;
   created_at?: string;
   updated_at?: string;
@@ -35,7 +35,7 @@ export interface CreateBlogPostInput {
   excerpt: string;
   category: string;
   author: string;
-  readTime?: string;
+  readtime?: string;
 }
 
 // Input type for updating an existing blog post
@@ -45,7 +45,7 @@ export interface UpdateBlogPostInput {
   excerpt?: string;
   category?: string;
   author?: string;
-  readTime?: string;
+  readtime?: string;
 }
 
 /**
@@ -117,7 +117,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
   const supabase = createBrowserClient();
   
   const slug = await generateUniqueSlug(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
+  const readtime = input.readtime || calculateReadTime(input.content);
   
   const { data, error } = await supabase
     .from('blogs')
@@ -128,7 +128,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readtime: readTime, // Changed from readTime to readtime to match database column
+      readtime: readtime, // Changed from readTime to readtime to match database column
       date: new Date().toISOString().split('T')[0],
     })
     .select()
@@ -174,14 +174,14 @@ export async function getBlogPostById(id: string): Promise<{ data: BlogPost | nu
  */
 export async function updateBlogPost(id: string, input: UpdateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = createBrowserClient();
-  
-  const updateData: any = { ...input };
-  
+
+  const updateData: UpdateBlogPostInput = { ...input };
+
   // Add readTime calculation back - use database column name
   if (input.content) {
     updateData.readtime = calculateReadTime(input.content);
     // Remove the camelCase version to avoid confusion
-    delete updateData.readTime;
+    delete updateData.readtime;
   }
   
   const { data, error } = await supabase
@@ -217,7 +217,7 @@ export async function upsertBlogPost(input: CreateBlogPostInput): Promise<{ data
   const supabase = createBrowserClient();
   
   const slug = generateSlug(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
+  const readtime = input.readtime || calculateReadTime(input.content);
   
   const { data, error } = await supabase
     .from('blogs')
@@ -228,7 +228,7 @@ export async function upsertBlogPost(input: CreateBlogPostInput): Promise<{ data
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readtime: readTime,
+      readtime: readtime,
       date: new Date().toISOString().split('T')[0],
     })
     .select()

@@ -69,7 +69,7 @@ export async function createBlogPostServer(input: CreateBlogPostInput): Promise<
   const supabase = await createServerClient();
   
   const slug = await generateUniqueSlugServer(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
+  const readtime = input.readtime || calculateReadTime(input.content);
   
   const { data, error } = await supabase
     .from('blogs')
@@ -80,7 +80,7 @@ export async function createBlogPostServer(input: CreateBlogPostInput): Promise<
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readtime: readTime,
+      readtime: readtime,
       date: new Date().toISOString().split('T')[0],
     })
     .select()
@@ -123,12 +123,12 @@ export async function getBlogPostByIdServer(id: string): Promise<{ data: BlogPos
  */
 export async function updateBlogPostServer(id: string, input: UpdateBlogPostInput): Promise<{ data: BlogPost | null; error: Error | null }> {
   const supabase = await createServerClient();
-  
-  const updateData: any = { ...input };
-  
+
+  const updateData: UpdateBlogPostInput = { ...input };
+
   if (input.content) {
     updateData.readtime = calculateReadTime(input.content);
-    delete updateData.readTime;
+    delete updateData.readtime;
   }
   
   const { data, error } = await supabase
