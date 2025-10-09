@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllBlogPostsServer, getBlogPostByIdServer } from "@/utils/supabase/blogCrudServer";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 
 export async function generateStaticParams() {
   // Define known slugs as fallback
   const fallbackSlugs = [
     { slug: 'test' },
+    { slug: 'github-copilot-acknowledgement' },
     { slug: 'getting-started-with-nextjs' },
     { slug: 'building-modern-web-apps' },
     { slug: 'typescript-best-practices' }
@@ -119,8 +122,29 @@ export default async function PostPage({ params }: { params: { slug: string } })
 
         {/* Article Content */}
         <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-12">
-          <div className="prose prose-lg max-w-none dark:prose-invert">
-            <ReactMarkdown>{post.content}</ReactMarkdown>
+          <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-pink-600 dark:prose-code:text-pink-400">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+              components={{
+                // Custom components for better styling
+                h1: ({children}) => <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">{children}</h1>,
+                h2: ({children}) => <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">{children}</h2>,
+                h3: ({children}) => <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{children}</h3>,
+                p: ({children}) => <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">{children}</p>,
+                code: ({children}) => <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm text-pink-600 dark:text-pink-400">{children}</code>,
+                pre: ({children}) => <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>,
+                blockquote: ({children}) => <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">{children}</blockquote>,
+                ul: ({children}) => <ul className="list-disc pl-6 mb-4 text-gray-700 dark:text-gray-300">{children}</ul>,
+                ol: ({children}) => <ol className="list-decimal pl-6 mb-4 text-gray-700 dark:text-gray-300">{children}</ol>,
+                li: ({children}) => <li className="mb-1">{children}</li>,
+                a: ({href, children}) => <a href={href} className="text-blue-600 dark:text-blue-400 hover:underline">{children}</a>,
+                strong: ({children}) => <strong className="font-semibold text-gray-900 dark:text-white">{children}</strong>,
+                em: ({children}) => <em className="italic">{children}</em>,
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
           </div>
         </article>
 
