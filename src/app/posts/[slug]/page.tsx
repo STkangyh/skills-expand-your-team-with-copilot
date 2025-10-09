@@ -1,46 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllBlogPostsServer, getBlogPostByIdServer } from "@/utils/supabase/blogCrudServer";
+import { getBlogPostByIdServer } from "@/utils/supabase/blogCrudServer";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 
 export async function generateStaticParams() {
-  // Define known slugs as fallback
-  const fallbackSlugs = [
+  // Return known slugs directly since we can't access Supabase during static generation
+  // These slugs will be statically generated, and any other slugs will be rendered dynamically
+  return [
     { slug: 'test' },
     { slug: 'github-copilot-acknowledgement' },
     { slug: 'getting-started-with-nextjs' },
     { slug: 'building-modern-web-apps' },
     { slug: 'typescript-best-practices' }
   ];
-  
-  try {
-    const { data: posts, error } = await getAllBlogPostsServer();
-    
-    if (error || !posts) {
-      console.warn('Using fallback slugs due to Supabase error:', error);
-      return fallbackSlugs;
-    }
-    
-    const params = posts.map((post) => ({
-      slug: post.id,
-    }));
-    
-    // Merge Supabase posts with fallback slugs to ensure all known posts are included
-    const allSlugs = [...params];
-    fallbackSlugs.forEach(fallback => {
-      if (!allSlugs.some(p => p.slug === fallback.slug)) {
-        allSlugs.push(fallback);
-      }
-    });
-    
-    console.log('Generated static params:', allSlugs);
-    return allSlugs;
-  } catch (error) {
-    console.warn('Error generating static params, using fallback:', error);
-    return fallbackSlugs;
-  }
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
