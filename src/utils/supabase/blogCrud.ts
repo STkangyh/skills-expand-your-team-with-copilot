@@ -65,7 +65,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
   const supabase = createBrowserClient();
   
   const slug = generateSlug(input.title);
-  const readTime = input.readTime || calculateReadTime(input.content);
+  // Remove readTime from database insert for now
   
   const { data, error } = await supabase
     .from('blogs')
@@ -76,7 +76,7 @@ export async function createBlogPost(input: CreateBlogPostInput): Promise<{ data
       excerpt: input.excerpt,
       category: input.category,
       author: input.author,
-      readTime: readTime,
+      // readTime: readTime, // Comment this out
       date: new Date().toISOString().split('T')[0],
     })
     .select()
@@ -125,10 +125,10 @@ export async function updateBlogPost(id: string, input: UpdateBlogPostInput): Pr
   
   const updateData: Partial<BlogPost> = { ...input };
   
-  // Recalculate read time if content is being updated
-  if (input.content) {
-    updateData.readTime = calculateReadTime(input.content);
-  }
+  // Remove readTime calculation for now
+  // if (input.content) {
+  //   updateData.readTime = calculateReadTime(input.content);
+  // }
   
   const { data, error } = await supabase
     .from('blogs')
