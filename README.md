@@ -90,6 +90,8 @@ Get your credentials from: https://supabase.com/dashboard/project/_/settings/api
 **📚 Documentation:**
 - [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Complete setup guide
 - [ENV_SETUP_SUMMARY.md](./ENV_SETUP_SUMMARY.md) - Quick reference
+- [CORS_TROUBLESHOOTING.md](./CORS_TROUBLESHOOTING.md) - Fix CORS and RLS issues
+- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - Production deployment guide
 
 ### Supabase Database Setup
 Create a `blogs` table in your Supabase project with the following schema:
@@ -248,32 +250,40 @@ export const blogPosts: Record<string, BlogPost> = {
 
 ## 🌐 Deployment
 
-The blog is configured for static export and can be deployed to:
+The blog can be deployed to various platforms. **Important:** Make sure to configure your Supabase RLS policies to avoid CORS errors!
+
+### Quick Deployment Guide
+
+See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for comprehensive deployment instructions including:
+- Vercel deployment with environment variables
+- Netlify configuration
+- Supabase RLS setup
+- CORS troubleshooting
 
 ### Vercel (Recommended)
-```bash
-# Connect your GitHub repository to Vercel
-# Vercel will automatically detect Next.js and handle deployment
-```
 
-### Netlify
-```bash
-# Build the project
-npm run build
+1. Connect your repository to Vercel
+2. Add environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+3. Deploy!
 
-# Deploy the 'out' directory to Netlify
-```
+### Other Platforms
 
-### GitHub Pages
-```bash
-# Build the project
-npm run build
+- **Netlify**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- **Railway**: Supports Next.js with auto-detection
+- **Render**: Configure build and start commands
+- **GitHub Pages**: Use static export mode
 
-# Push the 'out' directory contents to your gh-pages branch
-```
+### ⚠️ Important: Avoid CORS Errors
 
-### Other Static Hosts
-The `out` directory contains all static files needed for deployment to any web server.
+After deploying, if you see CORS errors in the browser console:
+
+1. **Enable RLS policies** in Supabase (most common fix)
+2. **Verify environment variables** are set in your deployment platform
+3. **Check Supabase URL** is correct
+
+See [CORS_TROUBLESHOOTING.md](./CORS_TROUBLESHOOTING.md) for detailed solutions.
 
 ## 🤝 Usage for Project Acknowledgements
 
