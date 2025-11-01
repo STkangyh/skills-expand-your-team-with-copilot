@@ -10,21 +10,32 @@ export interface SupabaseError {
   hint?: string;
 }
 
+interface EnhancedError extends Error {
+  originalError?: unknown;
+}
+
+/**
+ * Helper function to get a normalized error string for checking
+ */
+function getNormalizedErrorString(error: unknown): string {
+  if (!error) return '';
+  const errorMessage = (error as Error).message?.toLowerCase() || '';
+  const errorString = String(error).toLowerCase();
+  return `${errorMessage} ${errorString}`;
+}
+
 /**
  * Determines if an error is a CORS-related error
  */
 export function isCorsError(error: unknown): boolean {
   if (!error) return false;
   
-  const errorMessage = (error as Error).message?.toLowerCase() || '';
-  const errorString = String(error).toLowerCase();
+  const normalized = getNormalizedErrorString(error);
   
   return (
-    errorMessage.includes('cors') ||
-    errorMessage.includes('cross-origin') ||
-    errorMessage.includes('access-control-allow-origin') ||
-    errorString.includes('cors') ||
-    errorString.includes('cross-origin')
+    normalized.includes('cors') ||
+    normalized.includes('cross-origin') ||
+    normalized.includes('access-control-allow-origin')
   );
 }
 
@@ -51,15 +62,13 @@ export function isRlsError(error: unknown): boolean {
 export function isNetworkError(error: unknown): boolean {
   if (!error) return false;
   
-  const errorMessage = (error as Error).message?.toLowerCase() || '';
-  const errorString = String(error).toLowerCase();
+  const normalized = getNormalizedErrorString(error);
   
   return (
-    errorMessage.includes('network') ||
-    errorMessage.includes('failed to fetch') ||
-    errorMessage.includes('networkerror') ||
-    errorString.includes('err_failed') ||
-    errorString.includes('network')
+    normalized.includes('network') ||
+    normalized.includes('failed to fetch') ||
+    normalized.includes('networkerror') ||
+    normalized.includes('err_failed')
   );
 }
 
@@ -158,18 +167,19 @@ export async function withErrorHandling<T>(
       logErrorDetails(result.error, operationName);
       
       // Create an enhanced error with user-friendly message
-      const enhancedError = new Error(getEnhancedErrorMessage(result.error));
-      (enhancedError as Error & { originalError: unknown }).originalError = result.error;
+      const enhancedError = new Error(getEnhancedErrorMessage(result.error)) as EnhancedError;
+      enhancedError.originalError = result.error;
       
       return { data: null, error: enhancedError };
     }
     
-    return result;
+    // Return data with no error
+    return { data: result.data, error: null };
   } catch (err) {
     logErrorDetails(err, operationName);
     
-    const enhancedError = new Error(getEnhancedErrorMessage(err));
-    (enhancedError as Error & { originalError: unknown }).originalError = err;
+    const enhancedError = new Error(getEnhancedErrorMessage(err)) as EnhancedError;
+    enhancedError.originalError = err;
     
     return { data: null, error: enhancedError };
   }
