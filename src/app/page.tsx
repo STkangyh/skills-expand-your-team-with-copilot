@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { getAllPosts } from "@/data/blog";
+import { getAllBlogPostsServer } from "@/utils/supabase/blogCrudServer";
 
-export default function Home() {
-  const blogPosts = getAllPosts().slice(0, 3); // Get first 3 posts for homepage
+export default async function Home() {
+  const { data: allPosts } = await getAllBlogPostsServer();
+  const blogPosts = allPosts?.slice(0, 3) || []; // Get first 3 posts for homepage
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
