@@ -19,7 +19,6 @@
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "ssr": "^7.0.5",
     "supabase": "^2.72.7"
   },
   "devDependencies": {
