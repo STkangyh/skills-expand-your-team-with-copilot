@@ -17,8 +17,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const { data: post, error } = await getBlogPostByIdServer(params.slug);
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { data: post, error } = await getBlogPostByIdServer(slug);
 
   if (!post) {
     if (error) {
