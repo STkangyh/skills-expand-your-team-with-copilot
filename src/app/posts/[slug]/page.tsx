@@ -50,6 +50,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <Link href="/write" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 Write
               </Link>
+              <Link href="/notion-import" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Notion Import
+              </Link>
             </div>
           </nav>
         </div>
